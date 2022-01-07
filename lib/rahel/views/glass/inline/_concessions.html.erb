@@ -1,0 +1,11 @@
+<% @individual = individual %>
+<span class="inline-concessions">
+  <% case individual.visibility %>
+  <% when :public %>
+    öffentlich sichtbar
+  <% when :member %>
+    für registrierte Benutzer sichtbar
+  <% when :manager %>
+    intern sichtbar
+  <% end %>
+</span>

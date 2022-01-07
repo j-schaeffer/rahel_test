@@ -1,0 +1,436 @@
+@import "twitter/bootstrap/variables";
+
+// MODALE Attribute, allg. Aussehen
+
+.modal.wide {
+  .modal-dialog {
+    width: 900px;
+
+    @media only screen and (max-width: 991px){
+      width: 765px;
+    }
+
+    @media only screen and (max-width: 767px){
+      width: 95%;
+      margin: auto;
+    }
+  }
+
+}
+
+.modal-backdrop {
+  background-color: #ffffff;
+}
+
+.modal-header {
+  padding: 10px 15px 8px 20px;
+
+  button {
+    position: relative;
+    top: 2px;
+  }
+}
+.modal-body {
+  min-height: 150px;
+  padding: 10px 20px;
+}
+
+.modal-footer {
+  margin-top: 10px;
+  //margin: 5px 20px 15px 22px;
+  //border-top-width: 1;
+  //padding: 0;
+
+  .revision-message {
+    text-align: left;
+    position: absolute;
+    margin-right: 140px;
+  }
+}
+
+.modal-content {
+  border-radius: 0;
+}
+ 
+
+//// MODAL FÜR EDIT PROPERTIES
+
+.modal-edit {
+
+  .force-wrap {
+    word-wrap: break-word;
+  }
+  
+  .left-column {
+    margin-bottom: 10px;
+
+   .properties{
+    max-height: 550px;
+    overflow-y: scroll;
+   }
+  }
+
+  .add,
+  .replace {
+    display: none;
+  }
+
+  form {
+    label {
+      color: @text-color;
+    }
+  }
+
+  // Wird anscheinend bei Erstellen eines neuen Datensatzes gebraucht – J. Masche 29.9.2015
+  form.create-property {
+    input {
+      width: 81%;
+    }
+
+    button {
+      width: 18%;
+    }
+  }
+
+  // Keine Ahnung wofür das ist – J. Masche 29.9.2015
+  // table {
+  //   tr:not(:last-child) {
+  //     // TODO check browser support
+  //     td {
+  //       padding-bottom: 5px;
+  //     }
+  //   }
+
+  //   td:not(:last-child) {
+  //     padding-right: 5px;
+  //   }
+  // }
+
+  form.update-property {
+    .form-group.has-feedback {
+      margin: 0px;
+
+      span.form-control-feedback {
+        right: 6px;
+        width: 20px;
+
+        // Seit commit:9808ab4 hat sich an dem Bootstrap-CSS etwas geändert: Der Selektor
+        // ".has-feedback .form-control-feedback {" wurde abgeschwächt zu
+        // ".form-control-feedback {". Ich weiß nicht wieso, und ob das ein Bug ist.
+        // Jedenfalls ist jetzt die CSS-Spezifizität zu gering, so dass wichtige Properties
+        // ".glyphicon" genommen werden statt von ".form-control-feedback", insbesondere
+        // "position: relative" statt dem gewünschten "position: absolute". Wiederhole
+        // deswegen hier die wichtigen Eigenschaften. Falls sich herausstellt, dass die
+        // Änderung in Bootstrap ein Bug war und rückgängig gemacht wurde, kann das hier
+        // wieder entfernt werden.
+        position: absolute;
+        line-height: 34px;
+      }
+
+      input {
+        width: 100%;
+        padding-right: 25px;
+      }
+
+      textarea {
+        height: 350px;
+        max-width: 100%;
+      }
+    }
+
+    .form-group.has-success {
+      .glyphicon-warning-sign,
+      .glyphicon-remove {
+        display: none;
+      }
+    }
+
+    .form-group.has-warning {
+      .glyphicon-ok,
+      .glyphicon-remove {
+        display: none;
+      }
+    }
+
+    .form-group.has-error {
+      .glyphicon-ok,
+      .glyphicon-warning-sign {
+        display: none;
+      }
+    }
+  }
+
+  // Linke Spalte, gesetzte Werte
+
+
+  .property {
+    position: relative;
+    margin: 3px 0;
+
+    .summary {
+      border: 1px solid #e5e5e5;
+      border-radius: 3px;
+      margin-right: 35px;
+      padding: 6px 9px;
+      background-color: #fff;
+
+      .glyphicon {
+        display: none;
+      }
+    }
+
+    .summary.editable {
+      .glyphicon {
+        display: block;
+      }
+    }
+
+    .summary.editable.selected,
+    .summary.editable.selected:hover {
+      background-color: #d0d0d0;
+    }
+
+    .details {
+      display: none;
+    }
+
+    .delete-property {
+      border: 1px solid #e5e5e5;
+      border-radius: 3px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 6px;
+      background-color: #fff;
+    }
+
+    .summary.editable:hover,
+    .delete-property:hover {
+      text-decoration: none;
+      background-color: #eee;
+      cursor: pointer;
+    }
+
+    .glyphicon-trash,
+    .glyphicon-pencil {
+      position: relative;
+      top: 3px;
+      font-size: 15px;
+      padding-right: 3px;
+    }
+  }
+
+
+  // Rechte Spalte; Wert im Detail bzw. Auswahl/Benennung
+  .property.expanded {
+    .summary,
+    .delete-property {
+      display: none;
+    }
+
+    .details {
+      display: block;
+    }
+  }
+
+  // Nötig für verschachtelte, zB ContactPoint
+  .property:not(.expanded) {
+    .summary,
+    .delete-property {
+      display: block;
+    }
+
+    .details {
+      display: none;
+    }
+  }
+
+  .bool-form {
+    margin-top: -5px;
+    margin-left: 6px;
+
+    input {
+      width: inherit !important;
+    }
+  }
+
+  // bspw. bei URLs
+  .string-form.with-options {
+    select {
+      padding-left: 8px;
+    }
+
+    .form-control-feedback {
+      right: 19px !important;
+    }
+  }
+
+  // Tabs der Anzeige für  Alphabetisch / Hierarchie
+  .nav-tabs {
+    margin-top: 9px;
+  }
+  // Liste der Vorgaben
+  .range {
+    margin: 5px 0px;
+    padding: 0 5px;
+    max-height: 300px;
+    overflow-y: auto;
+
+    .existing-individual {
+      border: 1px solid #e5e5e5;
+      border-radius: 3px;
+      padding: 6px 9px;
+      margin: 3px 0 3px 0.1px;
+      background-color: #fff;
+      vertical-align: middle;
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .existing-individual:disabled {
+      color: #bbb;
+    }
+
+    .existing-individual:enabled:hover {
+      text-decoration: none;
+      color: #000;
+      background-color: #eee;
+      cursor: pointer;
+    }
+
+    button.active, button.active:hover {
+      color: #fff;
+      background-color: #337AB7;
+    }
+
+    .direct-hit {
+      font-weight: bold;
+    }
+
+    .glyphicon {
+      margin-right: 2px;
+    }
+
+    @width: 100%;
+    @offset: 10px;
+
+    .level1 {
+      margin-left: @offset;
+      width: @width - @offset;
+      float: right;
+    }
+
+    .level2 {
+      margin-left: @offset * 2;
+      width: @width - @offset * 2;
+      float: right;
+    }
+
+    .level3 {
+      margin-left: @offset * 3;
+      width: @width - @offset * 3;
+      float: right;
+    }
+
+    .level4 {
+      margin-left: @offset * 4;
+      width: @width - @offset * 4;
+      float: right;
+    }
+
+    .level5 {
+      margin-left: @offset * 5;
+      width: @width - @offset * 5;
+      float: right;
+    }
+  }
+}
+
+
+
+
+
+
+.edit-mode,
+.modal-edit {
+  .complain-if-empty:empty:before {
+    content: "Nicht genug Daten";
+    font-weight: bold;
+    font-style: italic;
+    color: @brand-danger;
+  }
+}
+
+.input-daterange {
+  width: 100%;
+  .date-from {
+    width: 50%;
+    float: left;
+    input.date {
+      border-radius: 3px;
+    }
+  }
+  .date-to {
+    width: 50%;
+    padding-left: 20px;
+    float: right;
+    input.date {
+      border-radius: 3px;
+    }
+  }
+}
+
+.datepicker {
+  z-index: 9999 !important;
+}
+
+// MODAL: Neuer Datensatz
+.modal-new {
+  .label-field {
+    margin-top: 30px;
+  }
+  .person-fields {
+    display: none;
+  }
+  .type-select, .new-type-label {
+      margin: 5px 0 10px;
+  }
+  img.delete-selected-type {
+    height: 20px;
+    margin: 0px 0 0 10px; 
+    cursor: pointer;
+  }
+
+  input {
+    margin: 3px 0;
+  }
+
+  .indi-typeselect {
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    padding: 6px 9px;
+    margin: 3px 0 3px 0.1px;
+    background-color: #fff;
+    vertical-align: middle;
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+
+  .indi-typeselect:disabled {
+    color: #bbb;
+  }
+
+  .indi-typeselect:enabled:hover {
+    text-decoration: none;
+    color: #000;
+    background-color: #eee;
+    cursor: pointer;
+  }
+
+  .indi-typeselect.active, .indi-typeselect.active:hover {
+    color: #fff;
+    background-color: #337AB7;
+  }
+}

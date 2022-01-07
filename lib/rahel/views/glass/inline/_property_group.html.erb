@@ -1,0 +1,53 @@
+<% @info_text = predicate_info predicate, individual_or_class: individual if respond_to? :predicate_info %>
+<% properties = individual.sorted_visible_properties(predicate, current_user) %>
+<div class="property-group
+       <%# Dies ist ein unschöner Hack, besser in LESS lösen! %>
+       <%= "row" unless predicate == "label" %>
+       <%= "editable" if editable %>
+       <%= "empty" if properties.empty? && individual.type_of(predicate) != :bool && !(["can_edit","can_be_edited_by","visible_for"].include? predicate) && !(local_assigns[:force_display] && force_display == true) %>"
+  data-predicate="<%= predicate %>"
+  data-individual-id="<%= individual.id %>"
+  data-toggle="tooltip" data-placement="left" data-title="Zum Bearbeiten klicken">
+  <div class="predicate js-tooltip-anchor col-md-3 "><%= @glass.humanize individual, predicate %>
+  <% if @info_text.present? %>
+    <%= render "glass/inline/info_helper", text: @info_text %>
+  <% end %>
+  <br>
+    <% if (predicate == "has_concept") && (individual.is_a? Rahel::SkosConceptScheme) && (individual.safe_value("hierarchical") == "true") %>
+      <div style="margin:3px 0"><a class="btn btn-xs btn-default" data-toggle="tab" href="#hierarchical-property2" role="button">Hierarchisch</a>
+      <a class="btn btn-xs btn-default" data-toggle="tab" href="#alphabetical-property2" role="button">Alphabetisch</a></div>
+    <% end%>
+  </div>
+  
+  <div class="properties col-md-9">
+    <% if properties.any? && properties.first.join? %>
+      <%# Diesen Fall gibt es nur in SAD, nicht in Maya. %>
+      <%= properties.map { |prop| prop.value }.join(", ").html_safe %>
+    <% elsif local_assigns[:hierarchical] && properties.any? %>
+      <% klass = properties.first.objekt.class %>
+      <% props_hierarchical = klass.property_hierarchy(properties) %>
+      <% props_hierarchical[0..9].each do |prop, level| %>
+        <%= @glass.inline_property prop, locals: local_assigns.merge({ level: level }) %>
+      <% end %>
+      <% if props_hierarchical.size > 10 %>
+        <div id="<%= predicate %>-collapsable-tail-hierarchical" class="property-group-collapsable-tail collapse"></div>
+        <a style="cursor:pointer;" class="js-collapse-property-group" data-predicate="<%= predicate %>" data-sortmode="hierarchical" data-target="#<%= predicate %>-collapsable-tail-hierarchical" type="button" data-alt-text="<span class='glyphicon glyphicon-chevron-up'></span> Weniger anzeigen"><span class="glyphicon glyphicon-chevron-down"></span> Mehr anzeigen</a>
+      <% end %>
+    <% else %>
+      <% properties[0..9].each do |prop| %>
+        <%= @glass.inline_property prop, locals: local_assigns %>
+      <% end %>
+      <% if properties.size > 10 %>
+        <div id="<%= predicate %>-collapsable-tail" class="property-group-collapsable-tail collapse"></div>
+        <a style="cursor:pointer;" class="js-collapse-property-group" data-predicate="<%= predicate %>" data-sortmode="alphabetical" data-target="#<%= predicate %>-collapsable-tail" type="button" data-alt-text="<span class='glyphicon glyphicon-chevron-up'></span> Weniger anzeigen"><span class="glyphicon glyphicon-chevron-down"></span> Mehr anzeigen</a>
+      <% end %>
+    <% end %>
+    <%# Spezialbehandlung für nicht-gesetzte Boolean Properties %>
+    <% if properties.empty? && individual.type_of(predicate) == :bool %>
+      <%= t("novalue") %>
+    <% end %>
+  </div>
+  <div class="edit-icon">
+    <span class="glyphicon glyphicon-pencil"></span>
+  </div>
+</div>

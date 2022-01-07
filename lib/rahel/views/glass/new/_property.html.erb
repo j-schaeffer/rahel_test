@@ -1,0 +1,69 @@
+<% hp = @glass.humanize individual, predicate %>
+
+<% if individual.type_of(predicate) == :objekt %>
+
+  <form class="form-horizontal create-objekt-property
+          <%= "cardinality-one" if individual.cardinality_of(predicate) == 1 %>"
+    data-predicate="<%= predicate %>"
+    data-individual-id="<%= individual.id %>">
+
+    <%
+      range = individual.range_of(predicate)
+      range = [range] unless range.is_a?(Array)
+      # Hole die Nachkommen der in der Range angegebenen Klassen
+      descendants = range
+        .map { |x| x.constantize.descendants rescue [] }
+        .flatten
+        .reject { |x| x.weak? }
+
+      objekt_ids = individual.objekt_ids(predicate)
+
+      # Kann die Kandidaten hier erst laden (nicht schon im Controller), da es sein kann, dass
+      # es mehrere Ranges gibt.
+      candidates = Rahel::Individual.where(type: range + descendants).order(:inline_label)
+    %>
+
+    <%# Gibt es einen Rails-Helper dafür, so eine Aufzählung zu erstellen? %>
+    <% x = range.map { |x| t x } %>
+    <% x = [x.take(x.length - 1).join(", "), x.last].reject(&:blank?).join(" oder ") %>
+    <input class="form-control range-filter" placeholder="<%= x %> suchen">
+
+    <% range_klass = range[0].constantize rescue Rahel::Individual %>
+    <%# Wir unterstützen die hierachische Darstellung nur bei homogenen Ranges. %>
+    <% if range.length == 1 && range_klass.hierarchical? %>
+      <div role="tabpanel">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#alphabetical" aria-controls="alphabetical" role="tab" data-toggle="tab">Alphabetisch</a></li>
+          <li role="presentation"><a href="#hierarchical" aria-controls="hierarchical" role="tab" data-toggle="tab">Hierachisch</a></li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="alphabetical">
+            <%= render "glass/range", candidates: candidates, objekt_ids: objekt_ids %>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="hierarchical">
+            <%= render "glass/range", objekt_ids: objekt_ids, hierarchical: true,
+                       range_klass: range_klass %>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <%= render "glass/range", candidates: candidates, objekt_ids: objekt_ids %>
+    <% end %>
+  </form>
+
+<% else %>
+
+  <form class="form-inline create-property"
+    data-predicate="<%= predicate %>"
+    data-individual-id="<%= individual.id %>">
+    <input class="form-control"
+      maxlength="255"
+      placeholder="Hier neue <%= hp %> eingeben und <Enter> drücken">
+    <button type="submit" class="btn btn-primary">Hinzufügen</button>
+    <%# TODO Hier "URL hinzufügen" schreiben, aber dafür muss ich erst lernen,
+      wie ich dem input "max-width" beibringe. %>
+  </form>
+
+<% end %>
