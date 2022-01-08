@@ -1,0 +1,25 @@
+<% hp = @glass.humanize individual, predicate %>
+
+<% if individual.type_of(predicate) == :objekt %>
+
+  <div class="modal-h3"><%= hp %> hinzufügen</div>
+  <form class="form-horizontal create-objekt-property
+          <%= "cardinality-one" if individual.cardinality_of(predicate) == 1 %>"
+    data-predicate="<%= predicate %>"
+    data-individual-id="<%= individual.id %>">
+    <input class="form-control range-filter" placeholder="In <%= hp %> suchen">
+    <%= render "glass/range", individual: individual, predicate: predicate %>
+  </form>
+
+<% else %>
+
+  <form class="form-inline create-property"
+    data-predicate="<%= predicate %>"
+    data-individual-id="<%= individual.id %>">
+    <input class="form-control" placeholder="Hier neue <%= hp %> eingeben und <Enter> drücken">
+    <button type="submit" class="btn btn-primary">Hinzufügen</button>
+    <%# TODO Hier "URL hinzufügen" schreiben, aber dafür muss ich erst lernen,
+      wie ich dem input "max-width" beibringe. %>
+  </form>
+
+<% end %>

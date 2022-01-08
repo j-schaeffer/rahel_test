@@ -1,0 +1,19 @@
+<div class="property-group"
+  data-predicate="<%= predicate %>"
+  data-individual-id="<%= individual.id %>"
+  data-toggle="tooltip" data-placement="left" data-title="Zum Bearbeiten klicken">
+  <div class="edit-icon">
+    <span class="glyphicon glyphicon-pencil"></span>
+  </div>
+  <div class="predicate"><%= @glass.humanize individual, predicate %>:</div>
+  <div class="properties">
+    <% properties = individual.get_sorted_properties_array(predicate) %>
+    <% if properties.any? && properties.first.join? %>
+      <%= properties.map { |prop| prop.value }.join(", ").html_safe %>
+    <% else %>
+      <% properties.each do |prop| %>
+        <%= @glass.inline_property prop %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

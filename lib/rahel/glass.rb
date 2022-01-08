@@ -7,15 +7,7 @@ module Rahel
     end
 
     def humanize individual, predicate
-      # Bei SAD gab es häufig den Fall, dass ein und dasselbe Prädikat bei verschiedenen
-      # Individuals verschieden übersetzt wurde. Deshalb waren die Prädikate in de.yml
-      # nach den Individual-Klassen sortiert. Daher sah die Funktion so aus:
-      #
-      # I18n.translate "#{individual.class.name}.#{predicate}"
-      #
-      # Bei Maya ist das (bisher) nicht der Fall, deswegen können wir hier die Prädikate
-      # auf der ersten Ebene haben:
-      I18n.translate predicate
+      I18n.translate "#{individual.class.name}.#{predicate}"
     end
 
     #
@@ -23,22 +15,19 @@ module Rahel
     #
 
     def inline individual, predicate, locals: {}
-      editable = @controller.current_user.can_edit_property?(predicate, individual)
       @controller.render_to_string(
         partial: "glass/inline/property_group",
         locals: {
           individual: individual,
           predicate: predicate,
-          editable: editable,
         }.merge(locals)
       ).html_safe
     end
 
     def inline_individual individual, locals: {}
-      template = "glass/inline/#{individual.class.name.underscore}"
-      if @controller.template_exists?(template, [], true)
+      if individual.respond_to? "inline_template"
         @controller.render_to_string(
-          partial: template,
+          partial: individual.inline_template,
           locals: { individual: individual }.merge(locals)
         ).html_safe
       else
@@ -58,23 +47,16 @@ module Rahel
     #
 
     def edit individual, predicate, locals: {}
-      # Spezialfall für das Label von Personen.
-      if predicate == "label" && individual.computed_label?
-        return edit_individual individual, label: true, locals: locals
-      end
-
-      props = individual.sorted_editable_properties(predicate, @controller.current_user)
+      props = individual.get_sorted_properties_array(predicate)
       prop_class = individual.class_of(predicate)
 
       if props.any?
-        props.map { |prop| edit_property(prop, locals: locals) }.join.html_safe
+        props.map { |prop| edit_property prop }.join.html_safe
       elsif individual.cardinality_of(predicate) == 1
         # Wir müssen vielleicht etwas anzeigen, obwohl kein Property in der DB ist.
 
         if prop_class == PropertyObjekt && individual.editable?(predicate)
           # Es handelt sich um ein "weak"-Individual-Fall.
-          # (Dieser Fall tritt in Maya nicht auf, da es keine weak Individuals gibt, die an
-          # einem cardinality-1-Property hängen.)
 
           # Zuerst das Individual erstellen (mit Revision)
           objekt = Individual.create(type: individual.singular_range_of(predicate))
@@ -89,30 +71,26 @@ module Rahel
           # Es ist nicht Objekt, es reicht daher ein fake Property.
           prop = prop_class.new(subject: individual,
                                 predicate: predicate)
-          edit_property(prop, locals: locals)
+          edit_property prop
         end
       end
     end
 
     def edit_property property, locals: {}
-      @controller.render_to_string(
-        partial: "glass/edit/property",
-        locals: { property: property }.merge(locals)
-      ).html_safe
+        @controller.render_to_string(
+          partial: "glass/edit/property",
+          locals: { property: property }.merge(locals)
+        ).html_safe
     end
 
-    # subject ist dafür da, bei Curatorships zu entscheiden, ob man sie aus der Personen-Sicht
-    # oder aus der Sammlungs-Sicht sieht.
-    def edit_individual individual, label: false, subject: nil, locals: {}
-      template = "glass/edit/#{individual.class.name.underscore}"
-      template += "_label" if label
-      if @controller.template_exists?(template, [], true)
+    def edit_individual individual, locals: {}
+      if individual.respond_to? "edit_template"
         @controller.render_to_string(
-          partial: template,
-          locals: { individual: individual, subject: subject }.merge(locals)
+          partial: individual.edit_template,
+          locals: { individual: individual }.merge(locals)
         ).html_safe
       else
-        ("<em>Bitte das Template glass/edit/_#{template}.html.erb erstellen!</em>").html_safe
+        individual.to_s
       end
     end
 

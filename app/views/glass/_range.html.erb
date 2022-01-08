@@ -1,0 +1,31 @@
+<% hp = @glass.humanize(individual, predicate) %>
+<% range = individual.range_of(predicate) %>
+<% range = [range] unless range.is_a?(Array) %>
+<% objekt_ids = individual.objekt_ids(predicate) %>
+<% cardOne = (individual.cardinality_of(predicate) == 1) %>
+
+<div class="range">
+  <% Rahel::Individual.where(type: range).order(:label).each do |candidate| %>
+    <button type="button"
+      class="existing-individual <%= "is-value" if objekt_ids.include?(candidate.id) %>"
+      data-type=<%= candidate.type %>
+      data-objekt-id="<%= candidate.id %>">
+      <% if cardOne && objekt_ids.any? %>
+        <span class="glyphicon glyphicon-retweet"></span>
+      <% else %>
+        <span class="glyphicon glyphicon-plus"></span>
+      <% end %>
+      <%= candidate.label %>
+    </button>
+  <% end %>
+
+  <% range.each do |type| %>
+    <%# Concepts dürfen nicht neu erstellt werden.
+        Wenn dies nicht mehr pauschaul für alle Schemes gilt, muss dieser Hack durch eine
+        richtige Lösung ersetzt werdern... %>
+    <% next if (type.index("Concept") || type == "TypeOfArchivalMaterial" || type == "TypeOfObjects") %>
+    <button type="submit" class="btn btn-primary new-individual" data-type="<%= type %>">
+      Neue/n <%= t "types.#{type}" %> „<span id="new-name"></span>“ erstellen
+    </button>
+  <% end %>
+</div>

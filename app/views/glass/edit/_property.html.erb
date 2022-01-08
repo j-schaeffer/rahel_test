@@ -1,0 +1,59 @@
+<% hp = @glass.humanize(property.subject, property.predicate) %>
+
+<%# id kann leer sein bei dummies %>
+<div class="property <%= "expanded" if property.cardinality == 1 && (property.property_type != :objekt || property.editable?) %>"
+  data-id="<%= property.id %>"
+  data-predicate="<%= property.predicate %>"
+  data-individual-id="<%= property.subject_id %>"
+  <%# data-objekt-id ist leer bei nicht-Objekt-Properties (brauchen wir für Range-Aktualisierung) %>
+  data-objekt-id="<%= property.objekt_id %>">
+
+  <div class="summary <%= "editable" if property.editable? %>">
+    <%= local_assigns[:prefix] %> <%= property.value.to_s %>
+    <span class="glyphicon glyphicon-pencil pull-right"></span>
+  </div>
+
+  <button class="delete-property">
+    <span class="glyphicon glyphicon-trash"></span>
+  </button>
+
+  <div class="details">
+    <% if property.property_type == :objekt %>
+      <% if property.editable? %>
+        <%= @glass.edit_individual(property.value) %>
+      <% end %>
+    <% else %>
+      <form class="form-horizontal update-property <%= property.property_type %>-form">
+        <div class="form-group has-success has-feedback">
+          <% if property.property_type == :text %>
+            <textarea class="form-control"
+              placeholder="<%= hp %>"
+              data-server-value="<%= property.value %>"><%= property.value %></textarea>
+          <% elsif property.property_type == :bool %>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox"
+                  data-server-value="<%= property.value %>"
+                  <%= "checked" if property.value %>>
+                <%= hp %>
+              </label>
+            </div>
+          <% elsif property.property_type == :date %>
+            <input class="form-control date"
+              placeholder="<%= hp %>"
+              data-server-value="<%= property.value.strftime("%-d.%-m.%Y") if property.value %>"
+              value="<%= property.value.strftime("%-d.%-m.%Y") if property.value %>">
+          <% else %>
+            <input class="form-control"
+              placeholder="<%= hp %>"
+              data-server-value="<%= property.value %>"
+              value="<%= property.value %>">
+          <% end %>
+          <span class="glyphicon glyphicon-ok form-control-feedback"></span>
+          <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+          <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+        </div>
+      </form>
+    <% end %>
+  </div>
+</div>

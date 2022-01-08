@@ -1,0 +1,19 @@
+<div class="property" data-id="<%= property.id %>">
+  <%= prefix if local_assigns[:prefix] %>
+  <% if property.type == "Rahel::PropertyObjekt" && property.value.respond_to?("inline_template") %>
+    <%= render property.value.inline_template, individual: property.value %>
+  <% elsif property.type == "Rahel::PropertyBool" %>
+    <%= property.value ? "Ja" : "Nein" %>
+  <% elsif property.type == "Rahel::PropertyEmail" %>
+    <%= mail_to(property.value, property.value, encode: "javascript") rescue property.value %>
+  <% elsif property.type == "Rahel::PropertyUrl" %>
+    <a href="<%= property.value %>" target="extern"><%= property.value %></a>
+    <span class="linker glyphicon glyphicon-new-window" data-url="<%= property.value %>"
+      data-toggle="tooltip" data-placement="top" data-title="Link in neuem Fenster öffnen"></span>
+  <% elsif property.type == "Rahel::PropertyText" %>
+    <%# simple_format ersetzt \n mit <br> und \n\n mit <p> %>
+    <%= simple_format property.value %>
+  <% else %>
+    <%= property.value.to_s %>
+  <% end %>
+</div>
