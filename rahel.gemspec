@@ -29,9 +29,4 @@ Gem::Specification.new do |spec|
   
   
   spec.add_runtime_dependency 'autoprefixer-rails', '~> 9.1', '>= 9.1.0'
-  #spec.add_runtime_dependency 'devise', '~> 4.8'
-  spec.add_runtime_dependency 'activemodel'
-  spec.add_runtime_dependency 'activesupport'
-  spec.add_runtime_dependency 'activerecord'
-  spec.add_runtime_dependency 'devise', '~> 4.8'
 end
